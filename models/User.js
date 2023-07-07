@@ -1,11 +1,13 @@
 const { Model, DataTypes } = require('sequelize');
-const sequelize = require('../config/connection');
 const bcrypt = require('bcrypt');
+const sequelize = require('../config/config');
 
+// create our User model
 class User extends Model {
-    checkPassword(loginPw) {
-        return bcrypt.compareSync(loginPw, this.password);
-    }
+  // set up method to run on instance data (per user) to check password
+  checkPassword(loginPw) {
+    return bcrypt.compareSync(loginPw, this.password);
+  }
 }
 
 User.init(
@@ -14,41 +16,37 @@ User.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
+      autoIncrement: true
     },
     username: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
-  
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [8],
-      },
-    },
+        len: [4]
+      }
+    }
   },
   {
-    // When adding hooks via the init() method, they go below
     hooks: {
-      // Use the beforeCreate hook to work with data before a new instance is created
+      // set up beforeCreate lifecycle "hook" functionality
       beforeCreate: async (newUserData) => {
-        // In this case, we are taking the user's email address, and making all letters lower case before adding it to the database.
-        newUserData.password = await bcrypt.hash(newUserData.password,10);
+        newUserData.password = await bcrypt.hash(newUserData.password, 10);
         return newUserData;
       },
-      // Here, we use the beforeUpdate hook to make all of the characters lower case in an updated email address, before updating the database.
       beforeUpdate: async (updatedUserData) => {
-        updatedUserData.password = await bcrypt.hash(updatedUserData.password,10);
+        updatedUserData.password = await bcrypt.hash(updatedUserData.password, 10);
         return updatedUserData;
-      },
+      }
     },
     sequelize,
     timestamps: false,
     freezeTableName: true,
     underscored: true,
-    modelName: 'user',
+    modelName: 'User'
   }
 );
 

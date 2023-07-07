@@ -19,17 +19,18 @@ const sess = {
     })
   };
 
+const hbs = exphbs.create();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session(sess))
 app.use(express.static("public"));
-// app.engine("handlebars", exphbs({ defaultLayout: "main" }));
+app.engine('handlebars', hbs.engine);
 app.set("view engine", "handlebars");
 
 
 // turn on routes
-// app.use(routes);
+app.use(routes);
 
 // turn on connection to db and server
 sequelize.sync({ force: false }).then(() => {
